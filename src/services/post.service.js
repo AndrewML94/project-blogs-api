@@ -1,4 +1,4 @@
-const { BlogPost, Category, PostCategory } = require('../models');
+const { BlogPost, Category, PostCategory, User } = require('../models');
 
 const createPost = async (title, content, categories, userId) => {
   const verifyCategory = await Category.count({ where: { id: categories } });
@@ -15,6 +15,33 @@ const createPost = async (title, content, categories, userId) => {
   return { type: null, message: createdPost };
 };
 
+const getAllPosts = async () => {
+  const allUsers = await BlogPost.findAll({
+    include: [
+      { model: User, as: 'user', attributes: ['id', 'displayName', 'email', 'image'] },
+      { model: Category, as: 'categories' },
+    ],
+  });
+
+  return { type: null, message: allUsers };
+};
+
+const getPostById = async (id) => {
+  const allUsers = await BlogPost.findOne({
+    where: { id },
+    include: [
+      { model: User, as: 'user', attributes: ['id', 'displayName', 'email', 'image'] },
+      { model: Category, as: 'categories', attributes: ['id', 'name'] },
+    ],
+  });
+
+  if (!allUsers) return { type: 'NOT_FOUND', message: 'Post does not exist' };
+
+  return { type: null, message: allUsers };
+};
+
 module.exports = {
   createPost,
+  getAllPosts,
+  getPostById,
 };
